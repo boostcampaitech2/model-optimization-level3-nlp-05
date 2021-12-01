@@ -59,7 +59,7 @@ python inference.py \
   - ex) `best.pt`, `best.ts`
   - pre-trained 모델로 학습했을 경우 `best.ts` 지정
   - default: `best.pt`
-- `--img-root`
+- `--img_root`
   - 테스트 이미지 데이터셋 경로
   - default: `/opt/ml/data/test`
 
