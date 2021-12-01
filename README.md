@@ -7,6 +7,8 @@
 docker run -it --gpus all --ipc=host -v ${path_to_code}:/opt/ml/code -v ${path_to_dataset}:/opt/ml/data placidus36/pstage4_lightweight:v0.4 /bin/bash
 ```
 
+<br>
+
 ### 2. Install dependencies
 ```bash
 pip install -r requirements.txt
@@ -23,6 +25,9 @@ python train.py \
 --model \
 --data \
 --pretrained \
+--wandb_entity \
+--wandb_project \
+--run_name \
 ```
 
 - `--model`
@@ -36,6 +41,17 @@ python train.py \
   - 해당 argument 지정 시 `model_config`를 사용하지 않고 pre-trained 모델을 불러와서 학습 실시
   - ex) `mobilenetv3_large_100`
   - default: `""`
+- `--wandb_entity`
+  - wandb entity 이름
+  - default: `this-is-real`
+- `--wandb_project`
+  - wandb project 이름
+  - default: `model-optimization`
+- `--run_name`
+  - wandb run 이름
+  - default: `run`
+
+<br>
 
 ### 2. inference (submission.csv)
 
