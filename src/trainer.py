@@ -114,6 +114,8 @@ class TorchTrainer:
         train_dataloader: DataLoader,
         n_epoch: int,
         val_dataloader: Optional[DataLoader] = None,
+        mean_time = float(0),
+        params_nums = 0
     ) -> Tuple[float, float]:
         """Train model.
 
@@ -179,7 +181,9 @@ class TorchTrainer:
             wandb.log({
                 "eval/loss": test_loss,
                 "eval/f1": test_f1 * 100,
-                "eval/acc": test_acc * 100
+                "eval/acc": test_acc * 100,
+                "mean_time": mean_time,
+                "params_nums": params_nums
             })
             if best_test_f1 > test_f1:
                 continue

@@ -18,7 +18,7 @@ import timm
 from src.dataloader import create_dataloader
 from src.loss import CustomCriterion
 from src.model import Model
-from src.trainer import TorchTrainer
+from src.trainer import TorchTrainer, count_model_params
 from src.utils.common import get_label_counts, read_yaml
 from src.utils.torch_utils import check_runtime, model_info
 
@@ -56,6 +56,14 @@ def train(
         )
         
     model.to(device)
+    
+    img_size = data_config["IMG_SIZE"]
+    mean_time = check_runtime(
+        model,
+        [model_config["input_channel"]] + [img_size, img_size],
+        device
+    )
+    params_nums = count_model_params(model)
 
     # Create dataloader
     train_dl, val_dl, test_dl = create_dataloader(data_config)
@@ -97,6 +105,8 @@ def train(
         train_dataloader=train_dl,
         n_epoch=data_config["EPOCHS"],
         val_dataloader=val_dl if val_dl else test_dl,
+        mean_time=mean_time,
+        params_nums=params_nums
     )
 
     # evaluate model with test set
