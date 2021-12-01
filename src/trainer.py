@@ -21,6 +21,7 @@ from tqdm import tqdm
 
 from src.utils.torch_utils import save_model
 
+import wandb
 
 def _get_n_data_from_dataloader(dataloader: DataLoader) -> int:
     """Get a number of data in dataloader.
@@ -172,9 +173,14 @@ class TorchTrainer:
                 )
             pbar.close()
 
-            _, test_f1, test_acc = self.test(
+            test_loss, test_f1, test_acc = self.test(
                 model=self.model, test_dataloader=val_dataloader
             )
+            wandb.log({
+                "eval/loss": test_loss,
+                "eval/f1": test_f1 * 100,
+                "eval/acc": test_acc * 100
+            })
             if best_test_f1 > test_f1:
                 continue
             best_test_acc = test_acc

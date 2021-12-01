@@ -22,6 +22,7 @@ from src.trainer import TorchTrainer
 from src.utils.common import get_label_counts, read_yaml
 from src.utils.torch_utils import check_runtime, model_info
 
+import wandb
 
 def train(
     model_config: Dict[str, Any],
@@ -126,6 +127,24 @@ def get_args():
         type=str,
         help="timm pre-trained model's name"
     )
+    parser.add_argument(
+        "--wandb_entity",
+        default="this-is-real",
+        type=str,
+        help="wandb entity"
+    )
+    parser.add_argument(
+        "--wandb_project",
+        default="model-optimization",
+        type=str,
+        help="wandb project name"
+    )
+    parser.add_argument(
+        "--run_name",
+        default="run",
+        type=str,
+        help="wandb run name"
+    )
     args = parser.parse_args()
     return args
 
@@ -152,6 +171,15 @@ def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     log_dir = get_log_dir()
+    
+    wandb.login()
+    wandb.init(
+        project=args.wandb_project,
+        entity=args.wandb_entity,
+        name=args.run_name
+    )
+    
+    wandb.config.update(args)
 
     test_loss, test_f1, test_acc = train(
         model_config=model_config,
