@@ -41,6 +41,7 @@ python train.py \
 
 ```bash
 python inference.py \
+--dst \
 --model_dir \
 --weight_name \
 --img_root \
