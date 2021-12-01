@@ -29,25 +29,26 @@ def train(
     log_dir: str,
     fp16: bool,
     device: torch.device,
+    pretrained_model: str
 ) -> Tuple[float, float, float]:
     """Train."""
+    
     # save model_config, data_config
     with open(os.path.join(log_dir, "data.yml"), "w") as f:
         yaml.dump(data_config, f, default_flow_style=False)
     with open(os.path.join(log_dir, "model.yml"), "w") as f:
         yaml.dump(model_config, f, default_flow_style=False)
 
-    # model_instance = Model(model_config, verbose=True)
-    # model_path = os.path.join(log_dir, "best.pt")
-    # print(f"Model save path: {model_path}")
-    # if os.path.isfile(model_path):
-    #     model_instance.model.load_state_dict(
-    #         torch.load(model_path, map_location=device)
-    #     )
-    # model_instance.model.to(device)
-    model = timm.create_model("mobilenetv3_large_100", pretrained=True, num_classes=6)
+    if pretrained_model is not None:
+        print(f"pre-trained model {pretrained_model} used...")
+        model = timm.create_model(pretrained_model, pretrained=True, num_classes=6)
+    else:
+        model_instance = Model(model_config, verbose=True)
+        model = model_instance.model
+
     model_path = os.path.join(log_dir, "best.pt")
     print(f"Model save path: {model_path}")
+    
     if os.path.isfile(model_path):
         model.load_state_dict(
             torch.load(model_path, map_location=device)
@@ -60,7 +61,6 @@ def train(
 
     # Create optimizer, scheduler, criterion
     optimizer = torch.optim.SGD(
-        #model_instance.model.parameters(), lr=data_config["INIT_LR"], momentum=0.9
         model.parameters(), lr=data_config["INIT_LR"], momentum=0.9
     )
     scheduler = torch.optim.lr_scheduler.OneCycleLR(
@@ -83,7 +83,6 @@ def train(
 
     # Create trainer
     trainer = TorchTrainer(
-        #model=model_instance.model,
         model=model,
         criterion=criterion,
         optimizer=optimizer,
@@ -100,10 +99,6 @@ def train(
     )
 
     # evaluate model with test set
-    # model_instance.model.load_state_dict(torch.load(model_path))
-    # test_loss, test_f1, test_acc = trainer.test(
-    #     model=model_instance.model, test_dataloader=val_dl if val_dl else test_dl
-    # )
     model.load_state_dict(torch.load(model_path))
     test_loss, test_f1, test_acc = trainer.test(
         model=model, test_dataloader=val_dl if val_dl else test_dl
@@ -124,6 +119,12 @@ def get_args():
         default="configs/data/taco.yaml",
         type=str,
         help="data config"
+    )
+    parser.add_argument(
+        "--pretrained",
+        default="",
+        type=str,
+        help="timm pre-trained model's name"
     )
     args = parser.parse_args()
     return args
@@ -158,6 +159,7 @@ def main():
         log_dir=log_dir,
         fp16=data_config["FP16"],
         device=device,
+        pretrained_model=args.pretrained if args.pretrained is not "" else None
     )
     print(f"Test | loss: {test_loss:.6f}, f1: {test_f1:.6f}, acc: {test_acc:.6f}")
 
