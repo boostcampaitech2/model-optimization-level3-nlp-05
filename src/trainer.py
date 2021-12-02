@@ -76,6 +76,13 @@ def _get_len_label_from_dataset(dataset: Dataset) -> int:
         raise NotImplementedError
 
 
+def _calculate_score(time, f1, goal_time=43.16, goal_f1=0.70):
+    sigmoid = nn.Sigmoid()
+    score_time = time / goal_time
+    score_f1 = sigmoid(20 * torch.tensor(goal_f1 - f1))
+    return 0.5 * score_time + score_f1
+
+
 class TorchTrainer:
     """Pytorch Trainer."""
 
@@ -182,6 +189,7 @@ class TorchTrainer:
                 "eval/loss": test_loss,
                 "eval/f1": test_f1 * 100,
                 "eval/acc": test_acc * 100,
+                "eval/score": _calculate_score(10 * mean_time, test_f1),
                 "mean_time": mean_time,
                 "params_nums": params_nums
             })
