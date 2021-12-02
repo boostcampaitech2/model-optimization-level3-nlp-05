@@ -197,7 +197,7 @@ def main():
         log_dir=log_dir,
         fp16=data_config["FP16"],
         device=device,
-        pretrained_model=args.pretrained if args.pretrained is not "" else None
+        pretrained_model=args.pretrained if args.pretrained != "" else None
     )
     print(f"Test | loss: {test_loss:.6f}, f1: {test_f1:.6f}, acc: {test_acc:.6f}")
 
