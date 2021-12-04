@@ -16,6 +16,32 @@ pip install -r requirements.txt
 
 <br>
 
+## Baseline
+```bash
+.
+├── configs
+│   ├── data                # data 관련 yaml 파일
+│   └── model               # parsing 전 모델 yaml 파일
+│   │   ├── example.yaml
+│   │   └── mobilenetv3.yaml
+│   │   └── effnetb0.yaml
+├── inference.py
+├── src
+│   ├── init.py
+│   ├── dataloader.py
+│   ├── loss.py
+│   ├── model.py
+│   ├── trainer.py
+│   ├── augmentation
+│   ├── modules             # parsing 을 위한 모델 아키텍쳐 모듈들
+│   └── utils
+├── tests
+│   └── test_model_parser.py
+│   └── test_model_conversion.py
+└── train.py
+```
+
+
 ## Run
 
 ### 1. train
